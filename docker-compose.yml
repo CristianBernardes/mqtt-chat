@@ -1,0 +1,53 @@
+version: "3.7"
+
+services:
+    # image project
+    app:
+        container_name: chat-app
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: chat
+        restart: unless-stopped
+        ports:
+            - "8009:8009"
+        working_dir: /var/www/
+        volumes:
+            - .:/var/www
+        networks:
+            - chat
+
+    # Eclipse Mosquitto
+    mosquitto:
+        container_name: mosquitto
+        image: eclipse-mosquitto
+        restart: unless-stopped
+        ports:
+            - "1883:1883"
+            - "3030:3030"
+        volumes:
+            - ./dockerconfs/mosquitto.conf:/mosquitto/config/mosquitto.conf
+        networks:
+            - chat
+
+    # db mysql
+    mysql:
+        container_name: chat-mysql
+        image: mysql:latest
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_USER: ${DB_USERNAME}
+        volumes:
+            - ./.docker/mysql/dbdata:/var/lib/mysql
+        command: --default-authentication-plugin=mysql_native_password --sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION" --skip-ssl
+        ports:
+            - "0633:3306"
+        networks:
+            - chat
+
+networks:
+    chat:
+        driver: bridge
