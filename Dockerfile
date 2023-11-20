@@ -55,7 +55,7 @@ USER $user
 # Se ambos existirem, ele inicia o servidor Laravel.
 # Caso contrário, ele executa "composer install" para instalar as dependências ausentes
 # e, em seguida, inicia o servidor.
-ENTRYPOINT if [ -f "composer.lock" ] && [ -d "vendor" ]; then php artisan serve --host=0.0.0.0 --port=8009; else composer install --ignore-platform-reqs && php artisan serve --host=0.0.0.0 --port=8009; fi
+ENTRYPOINT if [ -f "composer.lock" ] && [ -d "vendor" ]; then php artisan serve --host=0.0.0.0 --port=8009; else composer install --ignore-platform-reqs && npm install && npm run build && php artisan serve --host=0.0.0.0 --port=8009; fi
 
 # Expõe a porta 8009
 EXPOSE 8009
